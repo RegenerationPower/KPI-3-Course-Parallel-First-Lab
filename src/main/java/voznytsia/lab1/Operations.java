@@ -20,8 +20,12 @@ public class Operations {
         for (int i = 0; i < rowsA; i++) {
             for (int j = 0; j < colsB; j++) {
                 double sum = 0.0;
+                double c = 0.0;
                 for (int k = 0; k < colsA; k++) {
-                    sum += a[i][k] * b[k][j];
+                    double y = a[i][k] * b[k][j] - c;
+                    double t = sum + y;
+                    c = (t - sum) - y;
+                    sum = t;
                 }
                 result[i][j] = sum;
             }
@@ -54,7 +58,10 @@ public class Operations {
 
         for (int i = 0; i < rowsA; i++) {
             for (int j = 0; j < colsA; j++) {
-                result[i][j] = a[i][j] - b[i][j];
+                double y = a[i][j] - b[i][j];
+                double t = result[i][j] + y;
+                double c = (t - result[i][j]) - y;
+                result[i][j] = t;
             }
         }
 
@@ -70,7 +77,6 @@ public class Operations {
         }
         return matrix;
     }
-
 
     public double[] generateRandomArray(int size) {
         double[] array = new double[size];
