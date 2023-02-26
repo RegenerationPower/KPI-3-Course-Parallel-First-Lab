@@ -20,8 +20,6 @@ public class Main {
         try {
             String inputFilePath = new File(INPUT_FILENAME).getAbsolutePath();
             Scanner scanner = new Scanner(new File(inputFilePath));
-            String outputFilePath = new File(OUTPUT_FILENAME).getAbsolutePath();
-            PrintWriter writer = new PrintWriter(outputFilePath);
             int sizeMM = scanner.nextInt();
             int sizeME = scanner.nextInt();
             int sizeMX = scanner.nextInt();
@@ -36,29 +34,42 @@ public class Main {
             double[] B = operations.generateRandomArray(sizeB);
             double[] D = operations.generateRandomArray(sizeD);
 
+            String outputFilePath = new File(OUTPUT_FILENAME).getAbsolutePath();
+            PrintWriter writer = new PrintWriter(outputFilePath);
+
             AtomicReference<double[][]> result1 = new AtomicReference<>(new double[][]{{0.0}});
             AtomicReference<Double> result2 = new AtomicReference<>(0.0);
             AtomicReference<Double> result3 = new AtomicReference<>(0.0);
 
+            Object lock1 = new Object();
+            Object lock2 = new Object();
+            Object lock3 = new Object();
+
             Thread t1 = new Thread(() -> {
                 double[][] r = operations.multiplyMatrix(MM, operations.subtractMatrix(ME, MX));
-                result1.set(r);
-                System.out.println("\nResult 1: " + Arrays.deepToString(r));
-                writer.println("\nResult 1: " + Arrays.deepToString(result1.get()));
+                synchronized (lock1) {
+                    result1.set(r);
+                    System.out.println("\nResult 1: " + Arrays.deepToString(r));
+                    writer.println("\nResult 1: " + Arrays.deepToString(result1.get()));
+                }
             });
 
             Thread t2 = new Thread(() -> {
                 double r = operations.multiplyMatrix(ME, MX)[0][0] * q;
-                result2.set(r);
-                System.out.println("\nResult 2: " + r);
-                writer.println("\nResult 2: " + result2.get());
+                synchronized (lock2) {
+                    result2.set(r);
+                    System.out.println("\nResult 2: " + r);
+                    writer.println("\nResult 2: " + result2.get());
+                }
             });
 
             Thread t3 = new Thread(() -> {
                 double r = D[0] * operations.findMinValue(B);
-                result3.set(r);
-                System.out.println("\nResult 3: " + r);
-                writer.println("\nResult 3: " + result3.get());
+                synchronized (lock3) {
+                    result3.set(r);
+                    System.out.println("\nResult 3: " + r);
+                    writer.println("\nResult 3: " + result3.get());
+                }
             });
 
             t1.start();

@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="FirstLab" options="--add-exports java.base/jdk.internal.access=ALL-UNNAMED" />
+      <module name="FirstLab" options="" />
     </option>
   </component>
 </project>
