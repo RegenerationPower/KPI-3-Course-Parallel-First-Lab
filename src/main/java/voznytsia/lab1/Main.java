@@ -38,8 +38,8 @@ public class Main {
             PrintWriter writer = new PrintWriter(outputFilePath);
 
             AtomicReference<double[][]> result1 = new AtomicReference<>(new double[][]{{0.0}});
-            AtomicReference<Double> result2 = new AtomicReference<>(0.0);
-            AtomicReference<Double> result3 = new AtomicReference<>(0.0);
+            AtomicReference<double[][]> result2 = new AtomicReference<>(new double[][]{{0.0}});
+            AtomicReference<double[]> result3 = new AtomicReference<>(new double[]{0.0});
 
             Object lock1 = new Object();
             Object lock2 = new Object();
@@ -55,20 +55,20 @@ public class Main {
             });
 
             Thread t2 = new Thread(() -> {
-                double r = operations.multiplyMatrix(ME, MX)[0][0] * q;
+                double[][] r = operations.multiplyMatrixByScalar(operations.multiplyMatrix(ME, MX), q);
                 synchronized (lock2) {
                     result2.set(r);
-                    System.out.println("\nResult 2: " + r);
-                    writer.println("\nResult 2: " + result2.get());
+                    System.out.println("\nResult 2: " + Arrays.deepToString(r));
+                    writer.println("\nResult 2: " + Arrays.deepToString(result2.get()));
                 }
             });
 
             Thread t3 = new Thread(() -> {
-                double r = D[0] * operations.findMinValue(B);
+                double[] r = operations.multiplyVectorByScalar(D, operations.findMinValue(B));
                 synchronized (lock3) {
                     result3.set(r);
-                    System.out.println("\nResult 3: " + r);
-                    writer.println("\nResult 3: " + result3.get());
+                    System.out.println("\nResult 3: " + Arrays.toString(r));
+                    writer.println("\nResult 3: " + Arrays.toString(result3.get()));
                 }
             });
 
@@ -84,10 +84,21 @@ public class Main {
                 e.printStackTrace();
             }
 
-            double[][] MA = new double[][]{{result1.get()[0][0] + result2.get()}};
-            double[] Y = new double[]{(B[0] * ME[0][0]) * result3.get()};
-            System.out.println("\nFinal Result: MA=" + Arrays.deepToString(MA) + ", Y=" + Arrays.toString(Y));
-            writer.println("\nFinal Result: MA=" + Arrays.deepToString(MA) + ", Y=" + Arrays.toString(Y));
+            double[][] MA = new double[result1.get().length][result1.get()[0].length];
+            for (int i = 0; i < MA.length; i++) {
+                for (int j = 0; j < MA[0].length; j++) {
+                    MA[i][j] = result1.get()[i][j] + result2.get()[i][j];
+                }
+            }
+
+            double[] Y = operations.multiplyVectorByMatrix(B, ME);
+            System.out.println("\n\nY=" + Arrays.toString(Y));
+            for (int i = 0; i < Y.length; i++) {
+                Y[i] = Y[i] + result3.get()[i];
+            }
+
+            System.out.println("\nFinal Result: \nMA=" + Arrays.deepToString(MA) + "\n\nY=" + Arrays.toString(Y));
+            writer.println("\nFinal Result: \nMA=" + Arrays.deepToString(MA) + "\n\nY=" + Arrays.toString(Y));
 
             long endTime = System.nanoTime();
             long resultTime = (endTime - startTime);

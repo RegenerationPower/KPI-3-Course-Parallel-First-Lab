@@ -47,15 +47,70 @@ public class OperationsTest {
     }
 
     @Test
+    public void testMultiplyMatrixByScalar() {
+        double[][] a = {{1, 2}, {3, 4}};
+        double scalar = 2.0;
+        double[][] expected = {{2, 4}, {6, 8}};
+        double[][] result = operations.multiplyMatrixByScalar(a, scalar);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void testMultiplyMatrixByScalarWithZeroScalar() {
+        double[][] a = {{1, 2}, {3, 4}};
+        double scalar = 0.0;
+        double[][] expected = {{0, 0}, {0, 0}};
+        double[][] result = operations.multiplyMatrixByScalar(a, scalar);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void testMultiplyVectorByScalar() {
+        double[] vector = {1, 2, 3};
+        double scalar = 2.0;
+        double[] expected = {2, 4, 6};
+        double[] result = operations.multiplyVectorByScalar(vector, scalar);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void testMultiplyVectorByMatrix() {
+        double[] vector = {1, 2};
+        double[][] matrix = {{3, 4}, {5, 6}};
+        double[] expected = {13, 16};
+        double[] result = operations.multiplyVectorByMatrix(vector, matrix);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void testMultiplyVectorByMatrixWithIncompatibleDimensions() {
+        double[] vector = {1, 2, 3};
+        double[][] matrix = {{1, 2}, {3, 4}};
+        assertThrows(IllegalArgumentException.class, () -> operations.multiplyVectorByMatrix(vector, matrix));
+    }
+
+    @Test
     public void testGenerateRandomMatrix() {
-        double[][] matrix = operations.generateRandomMatrix(2, 3);
-        assertEquals(2, matrix.length);
-        assertEquals(3, matrix[0].length);
+        int rows = 3;
+        int cols = 4;
+        double[][] result = operations.generateRandomMatrix(rows, cols);
+        assertEquals(rows, result.length);
+        assertEquals(cols, result[0].length);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                assertTrue(result[i][j] >= 0 && result[i][j] < 1);
+            }
+        }
     }
 
     @Test
     public void testGenerateRandomArray() {
-        double[] array = operations.generateRandomArray(5);
-        assertEquals(5, array.length);
+        int size = 5;
+        double[] result = operations.generateRandomArray(size);
+        assertEquals(size, result.length);
+        for (int i = 0; i < size; i++) {
+            assertTrue(result[i] >= 0 && result[i] < 1);
+        }
     }
+
 }
